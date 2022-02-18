@@ -17,16 +17,10 @@ def getMailboxContent(mailbox, charset=None, filter='ALL'):
     return mail_ids
 
 
-def filterHTMLText(body_list):
-    for i in body_list:
-        if 'text/html' in i:
-            return i
-
-    return None
-
-
-def getMessageBody(message):
+def getMessageBody(message, sender_name):
     body_candidates = []
+    attachments = []
+    attached_files = []
 
     # Get all the MIME types that are text
     for part in message.walk():
@@ -35,21 +29,25 @@ def getMessageBody(message):
             body_candidates.append(
                 (part, part.get_content_type())
             )
+        if part.get('Content-Disposition') is not None:
+            attachments.append(
+                (part.get_filename(), part.get_payload(decode=True))
+            )
 
     if len(body_candidates) < 1:
         return None
 
-    return body_candidates[0][0].get_payload(decode=True).decode('utf-8')
+    body = body_candidates[0][0].get_payload(decode=True).decode('utf-8')
 
-    # html = filterHTMLText(body_candidates)
-    # if html:
-    #     return html[0].get_payload(decode=True).decode('utf-8')
-    # else:
-    #     return body_candidates[0][0].get_payload(decode=True).decode('utf-8')
+    for i in attachments:
+        file_name = f'ORDER_{sender_name}_{attachments.index(i)}'
+        file_extension = i[0].split('.')[-1]
+        file_path = file_name + '.' + file_extension
+        with open(file_path, 'wb') as file:
+            file.write(i[1])
+        attached_files.append(file_name)
 
-
-def getMessageAttachement(message):
-    return None
+    return body, attached_files
 
 
 def parseEmail(message):
@@ -82,15 +80,17 @@ def parseEmail(message):
     )
 
     # Get Body
-    body = getMessageBody(message)
+    body, attachments = getMessageBody(message, sender_name)
     print('{}Body:\n{}'.format(
         ' ' * 8,
         body)
     )
 
-    # Get Attachement
-    attachements = getMessageAttachement(message)
-    print(attachements)
+    print('{}Attachments: {}{}'.format(
+        ' ' * 8,
+        ' ' * (12 - len('Attachments')),
+        attachments)
+    )
 
 
 def main():
@@ -108,13 +108,13 @@ def main():
 
     # Extract all incomming mail
     mail_ids = getMailboxContent(mailbox)
-    id_list = mail_ids.split()
+    id_list = mail_ids.split()  # [b'0', b'1', ..., b'n']
 
     for mail in id_list:
         if mail.decode('utf-8') != '6':
             continue
-        # RFC822 is an Internet Message Access Protocol
         # Get Raw Email as bytes
+        # RFC822 is an Internet Message Access Protocol
         _, data = mailbox.fetch(mail, '(RFC822)')
         print(f'EMAIL: {id_list.index(mail)}')
         print('-------------------------------')
