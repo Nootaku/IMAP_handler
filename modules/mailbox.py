@@ -1,6 +1,12 @@
+"""MAILBOX OBJECT
+
+Class allowing an easy connection and login to a mailbox. Methods to get all
+messages from a specific folder are also present.
+
+Last update: Feb 18, 2022
+"""
 import imaplib
-import email
-from message import Email
+from modules.message import Email
 
 
 class Mailbox:
@@ -37,6 +43,7 @@ class Mailbox:
 
         for email_id in email_ids:
             # get raw email (as bytes)
+            # RFC822 is an Internet Message Access Protocol
             _, data = self.mailbox.fetch(email_id, '(RFC822)')
             raw_email = data[0][1]
 

@@ -1,12 +1,18 @@
+"""EMAIL MESSAGE OBJECT
+
+Class allowing to easily access the headers, body (text) and attachments of an
+email.
+
+Last update: Feb 18, 2022
+"""
 import email
-from sender import Sender
-from attachment import Attachment
-# email.message.EmailMessage
+from modules.sender import Sender
+from modules.attachment import Attachment
 
 
 class Email:
     def __init__(self, raw_email):
-        self.full_email = email.email_from_bytes(raw_email)
+        self.full_email = email.message_from_bytes(raw_email)
         self.sender = Sender(self.full_email.get('From'))
         self.subject = self.full_email.get('Subject')
         self.date = self.full_email.get('Date')
@@ -48,9 +54,9 @@ class Email:
 
     def downloadAttachments(self):
         for i in self.attachements:
-            file_extension = i.file_format
-            sender = self.sender.name
-            subject = self.subject
+            file_path = self.cdn + '/ORDER_'
+            file_path += self.sender.name + '_' + self.subject
+            file_path += f'.{i.file_format}'
             # date = self.date
-            file_name = f'{sender}_{subject}_attachment.{file_extension}'
-            i.save_to(file_name)
+
+            i.save_to(file_path)

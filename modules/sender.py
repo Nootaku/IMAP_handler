@@ -1,3 +1,9 @@
+"""EMAIL SENDER OBJECT
+
+Class allowing to easily access the data relative to a sender.
+
+Last update: Feb 18, 2022
+"""
 import email
 
 
