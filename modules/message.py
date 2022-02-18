@@ -38,7 +38,7 @@ class Email:
         return body
 
     @property
-    def attachements(self):
+    def attachments(self):
         attachments = []
 
         # Get all the MIME types that are text
@@ -53,7 +53,7 @@ class Email:
         return attachments
 
     def downloadAttachments(self):
-        for i in self.attachements:
+        for i in self.attachments:
             file_path = self.cdn + '/ORDER_'
             file_path += self.sender.name + '_' + self.subject
             file_path += f'.{i.file_format}'

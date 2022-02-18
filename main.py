@@ -30,17 +30,19 @@ def main():
     mailbox.getEmailMessages()
 
     for i in mailbox.emails:
+        attach_list = [a.file_name for a in i.attachments]
+
         print(f'EMAIL: {i.subject}')
         print('-------------------------------')
         print(f"{' ' * 8}From: {i.sender.address}")
         print(f"{' ' * 8}Subject: {i.subject}")
         print(f"{' ' * 8}Date: {i.date}")
-        print(f"{' ' * 8}Body:")
+        print(f"{' ' * 8}Body:\nSTART---")
         print(i.body)
-        print(f"\n{' ' * 8}Downloading Attachment ==> {i.attachements}")
+        print(f"---END\n\n{' ' * 8}Downloading Attachment == > {attach_list}")
 
         i.downloadAttachments()
-        print(f"{' ' * 8}Done")
+        print(f"{' ' * 8}Done\n\n")
 
 
 if __name__ == '__main__':
